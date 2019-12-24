@@ -21,6 +21,17 @@ def multiply(const, v):
         result.append(const * v[i])
     return result
 
+def xor(row, patternRow, genMat, destinationIndex):
+
+    v1 = genMat[row]
+    v2 = genMat[patternRow]
+
+    v3 = [0] * v1.__len__()
+
+    for i in range(v3.__len__()):
+        v3[i] = v1[i] ^ v2[i]
+
+    genMat[destinationIndex] = v3
 
 def isGenMatStandardized(genMat):
 
@@ -43,12 +54,69 @@ def isGenMatStandardized(genMat):
     if flag:
         print("generirajuca matrica je standardizirana")
 
-
 def swapRows(genMat, r1, r2):
 
     temp = genMat[r1]
     genMat[r1] = genMat[r2]
     genMat[r2] = temp
+
+def swapColumns(genMat, c1, c2):
+
+    numOfRows = genMat.__len__()
+
+    for row in range(numOfRows):
+        temp = genMat[row][c1]
+        genMat[row][c1] = genMat[row][c2]
+        genMat[row][c2] = temp
+
+def getColumn(genMat, index):
+
+    numOfRows = genMat.__len__()
+
+    result = [0] * numOfRows
+
+    for row in range(numOfRows):
+        result[row] = genMat[row][index]
+
+    return result
+
+def containsColumn(genMat, index):
+
+    numOfRows = genMat.__len__()
+    numOfColumns = genMat[0].__len__()
+
+    # trazeni stupac koji ima na poziciji index jedinicu
+    target = [0] * numOfRows
+    target[index] = 1
+
+    for column in range(numOfColumns):
+
+        temp = getColumn(genMat, column)
+
+        if temp == target:
+            return column
+
+    return -1
+
+def findPattern(genMat, currentColumn):
+
+    numOfRows = genMat.__len__()
+
+    pattern = [0] * (currentColumn + 1)
+    pattern[currentColumn] = 1
+
+    for row in range(numOfRows):
+        ok = True
+        for i in range(pattern.__len__()):
+            if genMat[row][i] != pattern[i]:
+                ok = False
+                break
+        if ok:
+            return row
+    return -1
+
+
+
 
 # print("please input your matrix\n1,2,3 -> row 1\n1,0,1 -> row 2\n.\n.\n.\n")
 # # abeceda koda
@@ -86,74 +154,73 @@ def swapRows(genMat, r1, r2):
 # swapRows(genMat, 0, 1)
 # print(genMat)
 
-import numpy as np
+genMat1 = [[0, 0, 1, 1, 1],
+          [1, 1, 0, 1, 1]]
+
+genMat2 = [[1, 0, 1, 1, 0],
+           [1, 1, 0, 1, 0],
+           [0, 1, 0, 0, 1]]
+
+genMat3 = [[1, 0, 0, 1, 1, 1, 0],
+           [0, 1, 0, 1, 1, 0, 1],
+           [0, 0, 0, 1, 0, 1, 1],
+           [0, 0, 1, 1, 1, 0, 0]]
+
+def normalize(genMat):
+
+    numOfRows = genMat.__len__()
+    numOfColumns = genMat[0].__len__()
+
+    for column in range(numOfRows):
+
+        for row in range(numOfRows):
+
+            # ako smo na dijagonali gdje bi elementi trebali biti 1
+            if row == column:
+
+                if genMat[row][column] != 1:
+
+                    # probamo pronaci postoji li gotov stupac koji ima jedinicu
+                    # na pravom mjestu a na ostalim mjestima nule
+                    index = containsColumn(genMat, column)
+                    if index != -1:
+                        swapColumns(genMat, index, column)
+                        break
+
+                    index = findPattern(genMat, column)
+                    if index != -1:
+                        patternRow = index
+                        xor(row, patternRow, genMat, row)
+                        continue
+
+            else: # sve ostalo kad nismo na dijagonali
+
+                if genMat[row][column] == 0:
+                    continue
+                else:
+
+                    index = containsColumn(genMat, column)
+                    if index != -1:
+                        swapColumns(genMat, index, column)
+                        break
+
+                    index = findPattern(genMat, column)
+                    if index != -1:
+                        patternRow = index
+                        xor(row, patternRow, genMat, row)
+                        continue
 
 
-def rref(B, tol=1e-8, debug=False):
-    A = B.copy()
-    rows, cols = A.shape
-    r = 0
-    pivots_pos = []
-    row_exchanges = np.arange(rows)
-    for c in range(cols):
-        if debug: print
-        "Now at row", r, "and col", c, "with matrix:";
-        print
-        A
+normalize(genMat3)
+print(genMat3)
 
-        ## Find the pivot row:
-        pivot = np.argmax(np.abs(A[r:rows, c])) + r
-        m = np.abs(A[pivot, c])
-        if debug: print
-        "Found pivot", m, "in row", pivot
-        if m <= tol:
-            ## Skip column c, making sure the approximately zero terms are
-            ## actually zero.
-            A[r:rows, c] = np.zeros(rows - r)
-            if debug: print
-            "All elements at and below (", r, ",", c, ") are zero.. moving on.."
-        else:
-            ## keep track of bound variables
-            pivots_pos.append((r, c))
 
-            if pivot != r:
-                ## Swap current row and pivot row
-                A[[pivot, r], c:cols] = A[[r, pivot], c:cols]
-                row_exchanges[[pivot, r]] = row_exchanges[[r, pivot]]
 
-                if debug: print
-                "Swap row", r, "with row", pivot, "Now:";
-                print
-                A
 
-            ## Normalize pivot row
-            A[r, c:cols] = A[r, c:cols] / A[r, c];
 
-            ## Eliminate the current column
-            v = A[r, c:cols]
-            ## Above (before row r):
-            if r > 0:
-                ridx_above = np.arange(r)
-                A[ridx_above, c:cols] = A[ridx_above, c:cols] - np.outer(v, A[ridx_above, c]).T
-                if debug: print
-                "Elimination above performed:";
-                print
-                A
-            ## Below (after row r):
-            if r < rows - 1:
-                ridx_below = np.arange(r + 1, rows)
-                A[ridx_below, c:cols] = A[ridx_below, c:cols] - np.outer(v, A[ridx_below, c]).T
-                if debug: print
-                "Elimination below performed:";
-                print
-                A
-            r += 1
-        ## Check if done
-        if r == rows:
-            break;
-    return (A, pivots_pos, row_exchanges)
 
-genMat = [[0, 0, 1, 1, 1], [1, 1, 0, 1, 1]]
-genMat2 = [[1,0,1,1,0], [1,1,0,1,0], [0,1,0,0,1]]
 
-print(rref(np.array(genMat)))
+
+
+
+

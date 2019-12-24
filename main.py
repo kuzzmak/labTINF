@@ -115,6 +115,41 @@ def findPattern(genMat, currentColumn):
             return row
     return -1
 
+def multiplyMod2(genMat, v):
+
+    numOfRows = genMat.__len__()
+    numOfColumns = genMat[0].__len__()
+
+    result = [0] * numOfColumns
+
+    for c in range(numOfColumns):
+
+        column = getColumn(genMat, c)
+
+        for i in range(numOfRows):
+
+            result[c] += v[i] * column[i]
+
+    return [x % 2 for x in result]
+
+def generateCodeWords(dim):
+
+    codeWords = []
+
+    for i in range(int(math.pow(2, dim))):
+
+        tempCodeWord = [0] * dim
+
+        binPart = bin(i).split("b")[1]
+        while binPart.__len__() != dim:
+            binPart = '0' + binPart
+
+        for j in range(binPart.__len__()):
+            tempCodeWord[j] = int(binPart[j])
+
+        codeWords.append(tempCodeWord)
+
+    return codeWords
 
 
 
@@ -210,12 +245,12 @@ def normalize(genMat):
                         xor(row, patternRow, genMat, row)
                         continue
 
+normalize(genMat2)
 
-normalize(genMat3)
-print(genMat3)
+codeWords = generateCodeWords(genMat2.__len__())
 
-
-
+for c in codeWords:
+    print(multiplyMod2(genMat2, c))
 
 
 

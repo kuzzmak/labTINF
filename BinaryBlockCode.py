@@ -401,6 +401,24 @@ class BinaryBlockCode(tk.Tk):
         # dimenzija koda
         self.k = self.genMat.__len__()
 
+    def code(self):
+
+        inputString = self.frames[CodingPage].codeEntry.get()
+
+        if inputString == "":
+            self.console.insert(tk.END, "[WARNING] upisite nesto u polje za unos\n")
+            self.console.see(tk.END)
+        else:
+            for i in range(inputString.__len__()):
+                if inputString[i] != '1' and inputString[i] != '0':
+                    self.console.insert(tk.END, "[ERROR] moguce je kodirati nizove koji se sastoje od simbola iz skupa: "  + str(self.alphabet) + "\n")
+                    self.console.see(tk.END)
+                    break
+
+            inputCode = []
+            for i in range(inputString.__len__()):
+                inputCode.append(int(inputString[i]))
+
 
 class StartPage(tk.Frame):
 
@@ -518,11 +536,14 @@ class CodingPage(tk.Frame):
         descriptionLabel = tk.Label(self, text="Na ovoj stranici je moguce vidjeti izgled kodirane\n rijeci unesene u polje ispod.")
         descriptionLabel.pack(padx=10, pady=10)
 
-        codeEntry = tk.Entry(self)
-        codeEntry.pack(padx=10, pady=10)
+        self.codeEntry = tk.Entry(self)
+        self.codeEntry.pack(padx=10, pady=10)
 
-        buttonCode = tk.Button(self, text="Kodiraj")
+        buttonCode = tk.Button(self, text="Kodiraj", command=lambda: controller.code())
         buttonCode.pack(padx=10, pady=10)
+
+        buttonBack = tk.Button(self, text="Nazad", command=controller.show_frame(GenMatPage))
+        buttonBack.pack(padx=10, pady=10)
 
 
 

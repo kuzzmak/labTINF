@@ -141,6 +141,11 @@ class BinaryBlockCode(tk.Tk):
             self.frames[GenMatPage].buttonLin['state'] = 'normal'
             self.frames[GenMatPage].buttonNK['state'] = 'normal'
 
+            # vektorski prostor
+            self.n = self.genMat[0].__len__()
+            # dimenzija koda
+            self.k = self.genMat.__len__()
+
         except ValueError:
             self.console.insert(tk.END, "[ERROR] sve vrijednosti moraju biti iz skupa [0, 1]\n")
             self.console.see(tk.END)
@@ -337,7 +342,11 @@ class BinaryBlockCode(tk.Tk):
             self.console.see(tk.END)
 
     def showNK(self):
-        pass #TODO
+
+        self.console.insert(tk.END, "[INFO] n generirajce matrice iznosi: " + str(self.n) + "\n")
+        self.console.see(tk.END)
+        self.console.insert(tk.END, "[INFO] k generirajuce matrice iznosi: " + str(self.k) + "\n")
+        self.console.see(tk.END)
 
     def linear(self):
         pass  #TODO
@@ -385,6 +394,10 @@ class BinaryBlockCode(tk.Tk):
         self.frames[GenMatPage].entryColumns.delete(0, tk.END)
         self.frames[GenMatPage].entryColumns.insert(0, self.columns)
 
+        # vektorski prostor
+        self.n = self.genMat[0].__len__()
+        # dimenzija koda
+        self.k = self.genMat.__len__()
 
 
 class StartPage(tk.Frame):
@@ -414,7 +427,7 @@ class InstructionsPage(tk.Frame):
         labelDescription = tk.Label(self, text="Ovdje se nalaze upute za koristenje aplikacije")
         labelDescription.pack(padx=10, pady=10)
 
-        labelInstructions = tk.Label(self, text="")
+        labelInstructions = tk.Label(self, text="") #TODO dodati upute za koristenje
         labelInstructions.pack(padx=10, pady=10)
 
         buttonBack = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
@@ -451,22 +464,26 @@ class GenMatPage(tk.Frame):
         buttonFrame.pack()
 
         buttonInput = tk.Button(buttonFrame, text="unos", command=lambda: [controller.saveRowsAndColumns(),
-                                                                                  controller.makeEntries()])
+                                                                           controller.makeEntries()])
         buttonInput.pack(side="left", padx=10, pady=10)
 
         buttonGenMat = tk.Button(buttonFrame, text="generiraj matricu", command=controller.getGenMat)
         buttonGenMat.pack(side="left", padx=10, pady=10)
 
-        self.buttonNK = tk.Button(buttonFrame, text="n i k zadanog koda", state="disabled", command=lambda: controller.showNK())
+        self.buttonNK = tk.Button(buttonFrame, text="n i k zadanog koda", state="disabled",
+                                  command=lambda: controller.showNK())
         self.buttonNK.pack(side="left", padx=10, pady=10)
 
-        self.buttonLin = tk.Button(buttonFrame, text="je li linearan?", state="disabled", command=lambda: controller.linear())
+        self.buttonLin = tk.Button(buttonFrame, text="je li linearan?", state="disabled",
+                                   command=lambda: controller.linear())
         self.buttonLin.pack(side="left", padx=10, pady=10)
 
-        self.buttonNormalize = tk.Button(buttonFrame, text="normaliziraj", state="disabled", command=lambda: controller.normalize())
+        self.buttonNormalize = tk.Button(buttonFrame, text="normaliziraj", state="disabled",
+                                         command=lambda: controller.normalize())
         self.buttonNormalize.pack(side="left", padx=10, pady=10)
 
-        self.buttonCodingSpeed = tk.Button(buttonFrame, text="kodna brzina", state="disabled", command=lambda: controller.codingSpeed())
+        self.buttonCodingSpeed = tk.Button(buttonFrame, text="kodna brzina", state="disabled",
+                                           command=lambda: controller.codingSpeed())
         self.buttonCodingSpeed.pack(side="left", padx=10, pady=10)
 
         # frame s generiranim poljima za unos

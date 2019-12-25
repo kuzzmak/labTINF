@@ -21,12 +21,6 @@ def multiply(const, v):
         result.append(const * v[i])
     return result
 
-
-
-
-
-
-
 def swapColumns(genMat, c1, c2):
 
     numOfRows = genMat.__len__()

@@ -20,7 +20,7 @@ class BinaryBlockCode(tk.Tk):
         scroll = tk.Scrollbar(consoleFrame)
         scroll.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.console = tk.Text(consoleFrame, height=5, width=30)
+        self.console = tk.Text(consoleFrame, height=10, width=30)
         self.console.pack(side="left", fill="both", expand=True)
         scroll.config(command=self.console.yview)
         self.console.config(yscrollcommand=scroll.set)
@@ -350,10 +350,29 @@ class BinaryBlockCode(tk.Tk):
         self.console.see(tk.END)
 
     def linear(self):
-        pass  #TODO
+
+        for i in range(self.rows):
+            for j in range(self.rows):
+                temp = [0] * self.columns
+                for k in range(self.columns):
+                    temp[k] = self.genMat[i][k] ^ self.genMat[j][k]
+                if not self.codeWords.__contains__(temp):
+                    self.codeWords.append(temp)
+
+        zeroCodeWord = [0] * self.columns
+        if self.codeWords.__contains__(zeroCodeWord):
+            self.console.insert(tk.END, "[INFO] kod je linearan\n")
+            self.console.see(tk.END)
+        else:
+            self.console.insert(tk.END, "[INFO] kod nije linearan\n")
+            self.console.see(tk.END)
 
     def codingSpeed(self):
-        pass #TODO
+
+        cs = self.k / self.n
+
+        self.console.insert(tk.END, "[INFO] kodna brzina zastitnog koda je: " + str(cs) + "\n")
+        self.console.see(tk.END)
 
     def setExample(self, num):
 
@@ -466,7 +485,20 @@ class InstructionsPage(tk.Frame):
         labelDescription = tk.Label(self, text="Ovdje se nalaze upute za koristenje aplikacije")
         labelDescription.pack(padx=10, pady=10)
 
-        labelInstructions = tk.Label(self, text="") #TODO dodati upute za koristenje
+        labelInstructions = tk.Label(self, text="Za stvaranje generirajuce matrice prvo je potrebno\n "
+                                                "upisati broj redaka i stupaca same matrice i zatim pritisnuti na gumb \"unos\".\n\n"
+                                                "Nakon toga se stvaraju polja za unos elemenata matrice.\n\n"
+                                                "Za spremanje upisanih vrijednosti potrebno je pritisnuti gumb \"generiraj matricu\"\n "
+                                                "nakon cega se stvara generirajuca matrica i omogucavaju ostali gumbi.\n\n"
+                                                "Vec gotove primjere generirajucih matrica moguce je vidjeti pritiskom na neki gumb \"Primjer\".\n\n"
+                                                "Za svođenje generirajuće matrice na standarnu formu, prvo je potrebno učitati primjer ili\n "
+                                                "zadati neku proizvoljnu i zatim pritisnuti na gumb \"normaliziraj\" nakon čega se \n"
+                                                "normalizirana matrica ispisuje u donjem dijelu prozora.\n\n"
+                                                "Za kodiranje određene riječi potrebno je prvo stvoriti generirajuću matricu,\n"
+                                                "zatim je normalizirati i nakon toga pritisnuti na gumb \"kodiraj\". Otvara se nova\n"
+                                                "stranica s poljem za unos željene riječi koju treba kodirati. Nakon unosa riječi pritisnuti\n"
+                                                "gumb \"kodiraj\" nakon čega se kodirana riječ pojavljuje u donjem dijelu prozora."
+                                                )
         labelInstructions.pack(padx=10, pady=10)
 
         buttonBack = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
@@ -545,6 +577,9 @@ class GenMatPage(tk.Frame):
 
         button3 = tk.Button(examplesFrame, text="Primjer 3", command=lambda: controller.setExample(3))
         button3.pack(side="left", padx=10, pady=10)
+
+        buttonBack = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
+        buttonBack.pack(padx=10, pady=10)
 
 
 class CodingPage(tk.Frame):

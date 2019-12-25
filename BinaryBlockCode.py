@@ -47,8 +47,7 @@ class BinaryBlockCode(tk.Tk):
         # sve kodne rijeci koda
         self.codeWords = []
 
-
-        for F in (StartPage, InstructionsPage, GenMatPage):
+        for F in (StartPage, InstructionsPage, GenMatPage, CodingPage):
 
             frame = F(container, self)
 
@@ -101,6 +100,7 @@ class BinaryBlockCode(tk.Tk):
         self.frames[GenMatPage].buttonNormalize['state'] = 'disabled'
         self.frames[GenMatPage].buttonLin['state'] = 'disabled'
         self.frames[GenMatPage].buttonNK['state'] = 'disabled'
+        self.frames[GenMatPage].buttonCode['state'] = 'disabled'
 
         for widget in self.frames[GenMatPage].entryFrame.winfo_children():
             widget.destroy()
@@ -140,6 +140,7 @@ class BinaryBlockCode(tk.Tk):
             self.frames[GenMatPage].buttonNormalize['state'] = 'normal'
             self.frames[GenMatPage].buttonLin['state'] = 'normal'
             self.frames[GenMatPage].buttonNK['state'] = 'normal'
+            self.frames[GenMatPage].buttonCode['state'] = 'normal'
 
             # vektorski prostor
             self.n = self.genMat[0].__len__()
@@ -388,6 +389,7 @@ class BinaryBlockCode(tk.Tk):
         self.frames[GenMatPage].buttonNormalize['state'] = 'normal'
         self.frames[GenMatPage].buttonLin['state'] = 'normal'
         self.frames[GenMatPage].buttonNK['state'] = 'normal'
+        self.frames[GenMatPage].buttonCode['state'] = 'normal'
 
         self.frames[GenMatPage].entryRows.delete(0, tk.END)
         self.frames[GenMatPage].entryRows.insert(0, self.rows)
@@ -486,6 +488,10 @@ class GenMatPage(tk.Frame):
                                            command=lambda: controller.codingSpeed())
         self.buttonCodingSpeed.pack(side="left", padx=10, pady=10)
 
+        self.buttonCode = tk.Button(buttonFrame, text="Kodiranje", state="disabled",
+                                    command=lambda: controller.show_frame(CodingPage))
+        self.buttonCode.pack(side="left", padx=10, pady=10)
+
         # frame s generiranim poljima za unos
         self.entryFrame = tk.Frame(self)
         self.entryFrame.pack(padx=10, pady=10)
@@ -502,6 +508,23 @@ class GenMatPage(tk.Frame):
 
         button3 = tk.Button(examplesFrame, text="Primjer 3", command=lambda: controller.setExample(3))
         button3.pack(side="left", padx=10, pady=10)
+
+
+class CodingPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        descriptionLabel = tk.Label(self, text="Na ovoj stranici je moguce vidjeti izgled kodirane\n rijeci unesene u polje ispod.")
+        descriptionLabel.pack(padx=10, pady=10)
+
+        codeEntry = tk.Entry(self)
+        codeEntry.pack(padx=10, pady=10)
+
+        buttonCode = tk.Button(self, text="Kodiraj")
+        buttonCode.pack(padx=10, pady=10)
+
+
 
 
 if __name__ == "__main__":

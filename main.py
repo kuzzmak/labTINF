@@ -133,14 +133,22 @@ def multiplyMod2(genMat, v):
     return [x % 2 for x in result]
 
 def generateCodeWords(dim):
+    """ funkcija za stvaranje kodnih rijeci dimenzije :param dim
+    :param dim: dimenzija pojedine kodne rijeci
+    :return: lista kodnih rijeci
+    """
 
+    # lista kodnih rijeci
     codeWords = []
 
+    # kodnih rijeci ima 2 na zeljenu duljinu, odnosno dim
     for i in range(int(math.pow(2, dim))):
 
         tempCodeWord = [0] * dim
 
+        # pretvaranje decimalne vrijednosti u binarnu
         binPart = bin(i).split("b")[1]
+        # dodavanje prefiksnih nula do dimenzije dim
         while binPart.__len__() != dim:
             binPart = '0' + binPart
 

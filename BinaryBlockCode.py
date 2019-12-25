@@ -29,8 +29,16 @@ class BinaryBlockCode(tk.Tk):
 
         # rjecnik svih stranica
         self.frames = {}
+        # broj redaka generirajuce matrice
+        self.rows = 0
+        # broj stupaca generirajuce matrice
+        self.columns = 0
 
-        for F in (StartPage, GenMatPage):
+        self.entries = []
+
+        self.genMat = []
+
+        for F in (StartPage, InstructionsPage, GenMatPage):
 
             frame = F(container, self)
 
@@ -46,6 +54,75 @@ class BinaryBlockCode(tk.Tk):
         frame = self.frames[cont]
         frame.tkraise()
 
+    def saveRowsAndColumns(self):
+        """ funkcija za spremanje broja unesenih redaka i stupaca generirajuce matrice
+        :return:
+        """
+
+        if self.frames[GenMatPage].entryRows.get() != "":
+            try:
+                self.rows = int(self.frames[GenMatPage].entryRows.get())
+                self.console.insert(tk.END, "[INFO] broj redaka: " + str(self.rows) + "\n")
+            except ValueError:
+                self.console.insert(tk.END, "[ERROR] broj redaka mora biti pozitivan broj\n")
+                self.console.see(tk.END)
+
+        else:
+            self.console.insert(tk.END, "[WARNING] unesite ispravan broj redaka\n")
+            self.console.see(tk.END)
+
+        if self.frames[GenMatPage].entryColumns.get() != "":
+            try:
+                self.columns = int(self.frames[GenMatPage].entryColumns.get())
+                self.console.insert(tk.END, "[INFO] broj stupaca: " + str(self.columns) + "\n")
+            except ValueError:
+                self.console.insert(tk.END, "[ERROR] broj stupaca mora biti pozitivan broj\n")
+                self.console.see(tk.END)
+
+        else:
+            self.console.insert(tk.END, "[WARNING] unesite ispravan broj stupaca\n")
+            self.console.see(tk.END)
+
+    def makeEntries(self):
+
+        for widget in self.frames[GenMatPage].entryFrame.winfo_children():
+            widget.destroy()
+
+        for i in range(self.rows):
+
+            entryRow = tk.Frame(self.frames[GenMatPage].entryFrame)
+            entryRow.pack()
+
+            for j in range(self.columns):
+                entry = tk.Entry(entryRow)
+                entry.pack(side="left", padx=10, pady=10)
+                self.entries.append(entry)
+
+    def getGenMat(self):
+
+        inputs = []
+
+        try:
+            for e in self.entries:
+                if int(e.get()) == 1 or int(e.get()) == 0:
+                    inputs.append(int(e.get()))
+                else:
+                    self.console.insert(tk.END, "[ERROR] sve vrijednosti moraju biti iz skupa [0, 1]\n")
+                    self.console.see(tk.END)
+
+            for i in range(self.rows):
+                row = [0] * self.columns
+                for j in range(self.columns):
+                    row[j] = inputs[j + self.columns * i]
+                self.genMat.append(row)
+
+        except ValueError:
+            self.console.insert(tk.END, "[ERROR] sve vrijednosti moraju biti iz skupa [0, 1]\n")
+            self.console.see(tk.END)
+
+
+
+
 class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -60,6 +137,25 @@ class StartPage(tk.Frame):
 
         buttonGenMat = tk.Button(frame, text="Unos generirajuce matrice", command=lambda: controller.show_frame(GenMatPage))
         buttonGenMat.pack(padx=10, pady=10)
+
+        buttonSteps = tk.Button(frame, text="Upute za koristenje", command=lambda: controller.show_frame(InstructionsPage))
+        buttonSteps.pack(padx=10, pady=10)
+
+
+class InstructionsPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        labelDescription = tk.Label(self, text="Ovdje se nalaze upute za koristenje aplikacije")
+        labelDescription.pack(padx=10, pady=10)
+
+        labelInstructions = tk.Label(self, text="")
+        labelInstructions.pack(padx=10, pady=10)
+
+        buttonBack = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(StartPage))
+        buttonBack.pack(padx=10, pady=10)
+
 
 class GenMatPage(tk.Frame):
 
@@ -86,10 +182,18 @@ class GenMatPage(tk.Frame):
         self.entryColumns = tk.Entry(inputFrame)
         self.entryColumns.pack(side="left", padx=5, pady=10)
 
-        buttonGenMat = tk.Button(self, text="Generiraj matricu")
-        buttonGenMat.pack(padx=10, pady=10)
+        buttonFrame = tk.Frame(self)
+        buttonFrame.pack()
 
+        buttonGenMat = tk.Button(buttonFrame, text="Generiraj matricu", command=lambda: [controller.saveRowsAndColumns(),
+                                                                                  controller.makeEntries()])
+        buttonGenMat.pack(side="left", padx=10, pady=10)
 
+        buttonPrintGenMat = tk.Button(buttonFrame, text="Napravi matricu", command=controller.getGenMat)
+        buttonPrintGenMat.pack(side="right", padx=10, pady=10)
+
+        self.entryFrame = tk.Frame(self)
+        self.entryFrame.pack(padx=10, pady=10)
 
 
 

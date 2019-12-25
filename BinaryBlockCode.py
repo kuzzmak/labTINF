@@ -119,6 +119,7 @@ class BinaryBlockCode(tk.Tk):
 
     def getGenMat(self):
 
+        self.genMat = []
         inputs = []
 
         try:
@@ -344,6 +345,47 @@ class BinaryBlockCode(tk.Tk):
     def codingSpeed(self):
         pass #TODO
 
+    def setExample(self, num):
+
+        if num == 1:
+            self.genMat = [[0, 0, 1, 1, 1],
+                           [1, 1, 0, 1, 1]]
+
+        elif num == 2:
+            self.genMat = [[1, 0, 1, 1, 0],
+                           [1, 1, 0, 1, 0],
+                           [0, 1, 0, 0, 1]]
+        else:
+            self.genMat = [[1, 0, 0, 1, 1, 1, 0],
+                           [0, 1, 0, 1, 1, 0, 1],
+                           [0, 0, 0, 1, 0, 1, 1],
+                           [0, 0, 1, 1, 1, 0, 0]]
+
+        self.rows = self.genMat.__len__()
+        self.columns = self.genMat[0].__len__()
+
+        self.makeEntries()
+
+        values = []
+        for row in self.genMat:
+            for value in row:
+                values.append(value)
+
+        for e in range(self.entries.__len__()):
+            text = values[e]
+            self.entries[e].insert(0, text)
+
+        self.frames[GenMatPage].buttonCodingSpeed['state'] = 'normal'
+        self.frames[GenMatPage].buttonNormalize['state'] = 'normal'
+        self.frames[GenMatPage].buttonLin['state'] = 'normal'
+        self.frames[GenMatPage].buttonNK['state'] = 'normal'
+
+        self.frames[GenMatPage].entryRows.delete(0, tk.END)
+        self.frames[GenMatPage].entryRows.insert(0, self.rows)
+        self.frames[GenMatPage].entryColumns.delete(0, tk.END)
+        self.frames[GenMatPage].entryColumns.insert(0, self.columns)
+
+
 
 class StartPage(tk.Frame):
 
@@ -431,10 +473,23 @@ class GenMatPage(tk.Frame):
         self.entryFrame = tk.Frame(self)
         self.entryFrame.pack(padx=10, pady=10)
 
+        # farme s gumbima za gotov primjer generirajuce matrice
+        examplesFrame = tk.Frame(self)
+        examplesFrame.pack(padx=10, pady=10)
+
+        button1 = tk.Button(examplesFrame, text="Primjer 1", command=lambda: controller.setExample(1))
+        button1.pack(side="left", padx=10, pady=10)
+
+        button2 = tk.Button(examplesFrame, text="Primjer 2", command=lambda: controller.setExample(2))
+        button2.pack(side="left", padx=10, pady=10)
+
+        button3 = tk.Button(examplesFrame, text="Primjer 3", command=lambda: controller.setExample(3))
+        button3.pack(side="left", padx=10, pady=10)
+
 
 if __name__ == "__main__":
 
     App = BinaryBlockCode()
     App.title("Zadatak 2 - grupa P02_6")
-    App.geometry("800x600")
+    # App.geometry("800x600")
     App.mainloop()

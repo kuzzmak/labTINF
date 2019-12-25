@@ -419,6 +419,25 @@ class BinaryBlockCode(tk.Tk):
             for i in range(inputString.__len__()):
                 inputCode.append(int(inputString[i]))
 
+            if inputCode.__len__() % self.k != 0:
+                self.console.insert(tk.END, "[ERROR] duljina rijeci za kodirati nije visekratnik broja " + str(self.k) + "\n")
+                self.console.see(tk.END)
+            else:
+                coddedMessage = []
+                for i in range(0, inputString.__len__(), self.k):
+                    sub = []
+                    for j in range(self.k):
+                        sub.append(int(inputString[i + j]))
+                    codedWord = self.multiplyMod2(sub)
+                    coddedMessage.extend(codedWord)
+
+                coddedMessageString = ""
+                for i in coddedMessage:
+                    coddedMessageString = coddedMessageString + str(i)
+
+                self.console.insert(tk.END, "[INFO] kodirana poruka: " + inputString + " je " + coddedMessageString + "\n")
+                self.console.see(tk.END)
+
 
 class StartPage(tk.Frame):
 
@@ -542,10 +561,8 @@ class CodingPage(tk.Frame):
         buttonCode = tk.Button(self, text="Kodiraj", command=lambda: controller.code())
         buttonCode.pack(padx=10, pady=10)
 
-        buttonBack = tk.Button(self, text="Nazad", command=controller.show_frame(GenMatPage))
+        buttonBack = tk.Button(self, text="Nazad", command=lambda: controller.show_frame(GenMatPage))
         buttonBack.pack(padx=10, pady=10)
-
-
 
 
 if __name__ == "__main__":

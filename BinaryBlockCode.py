@@ -95,18 +95,25 @@ class BinaryBlockCode(tk.Tk):
             self.console.see(tk.END)
 
     def makeEntries(self):
+        """ Funkcija za generiranje polja za unos u frameu GenMatPage
 
+        :return:
+        """
+
+        # gumbe nije moguce pritisnuti sve dok se ne stvori generirajuca matrica
         self.frames[GenMatPage].buttonCodingSpeed['state'] = 'disabled'
         self.frames[GenMatPage].buttonNormalize['state'] = 'disabled'
         self.frames[GenMatPage].buttonLin['state'] = 'disabled'
         self.frames[GenMatPage].buttonNK['state'] = 'disabled'
         self.frames[GenMatPage].buttonCode['state'] = 'disabled'
 
+        # ako je prethodno postojalo polja za unos, unistavaju se
         for widget in self.frames[GenMatPage].entryFrame.winfo_children():
             widget.destroy()
 
         self.entries = []
 
+        # stvaranje polja
         for i in range(self.rows):
 
             entryRow = tk.Frame(self.frames[GenMatPage].entryFrame)
@@ -118,7 +125,11 @@ class BinaryBlockCode(tk.Tk):
                 self.entries.append(entry)
 
     def getGenMat(self):
+        """ Funkcija za stvaranje generirajuce matrice
+        Uzimaju se vrijednosti iz vec generiranih polja za unos
 
+        :return:
+        """
         self.genMat = []
         inputs = []
 
@@ -136,6 +147,7 @@ class BinaryBlockCode(tk.Tk):
                     row[j] = inputs[j + self.columns * i]
                 self.genMat.append(row)
 
+            # omogucavanje gumba posto je stvorena generirajuca matrica
             self.frames[GenMatPage].buttonCodingSpeed['state'] = 'normal'
             self.frames[GenMatPage].buttonNormalize['state'] = 'normal'
             self.frames[GenMatPage].buttonLin['state'] = 'normal'
@@ -152,6 +164,15 @@ class BinaryBlockCode(tk.Tk):
             self.console.see(tk.END)
 
     def xor(self, row, patternRow, destinationIndex):
+        """ Funkcija iskljucivo ili koja uzima redak row i redak gdje se nalazi pattern,
+        napravi iskljucivo ili izmedju ta dva retka i zapise rezultat u destinationIndex redak
+        generirajuce matrice
+
+        :param row: prvi redak u operaciji
+        :param patternRow: drugi redak u operaciji
+        :param destinationIndex: redak za zapis rezultata
+        :return:
+        """
 
         v1 = self.genMat[row]
         v2 = self.genMat[patternRow]
@@ -164,6 +185,10 @@ class BinaryBlockCode(tk.Tk):
         self.genMat[destinationIndex] = v3
 
     def isGenMatStandardized(self):
+        """ Funkcija za provjeru je li generirajuca matrica standardizirana, odnosno je li u standardnoj formi
+        :return:
+        """
+
         #FIXME
         flag = True
 
@@ -185,21 +210,33 @@ class BinaryBlockCode(tk.Tk):
             print("generirajuca matrica je standardizirana")
 
     def swapRows(self, r1, r2):
+        """ Funkcija za zamjenu dva retka generirajuce matrice
+        :param r1: prvi redak
+        :param r2: drugi redak
+        :return:
+        """
 
         temp = self.genMat[r1]
         self.genMat[r1] = self.genMat[r2]
         self.genMat[r2] = temp
 
     def swapColumns(self, c1, c2):
+        """ Funkcija za zamjenu dva stupca generirajuce matrice
+        :param c1: prvi stupac
+        :param c2: drugi stupac
+        :return:
+        """
 
-        numOfRows = self.genMat.__len__()
-
-        for row in range(numOfRows):
+        for row in range(self.rows):
             temp = self.genMat[row][c1]
             self.genMat[row][c1] = self.genMat[row][c2]
             self.genMat[row][c2] = temp
 
     def getColumn(self, index):
+        """ Funkcija za dohvat jednog stupca generirajuce matrice
+        :param index: indeks stupca
+        :return: stupac generirajuce matrice
+        """
 
         numOfRows = self.genMat.__len__()
 
@@ -211,7 +248,14 @@ class BinaryBlockCode(tk.Tk):
         return result
 
     def containsColumn(self, index):
+        """ Funkcija za provjeru sadrzi li generirajuca matrica stupac odredjenog izgleda.
+        Npr. ako je broj redaka matrice 3, da bi matrica bila standardizirana prvi stupac mora izgledati
+        [1, 0, 0](transponirano), drugi [0, 1, 0] itd. Ova funkcija provjerava je li stupac index upravo u ovom
+        obliku koji naravno ovisi o dimenzionlanosti
 
+        :param index: indeks stupca koji se provjerava
+        :return: -1 -> ne postoji, index -> gdje se nalazi u matrici trazeni stupac
+        """
         numOfRows = self.genMat.__len__()
         numOfColumns = self.genMat[0].__len__()
 
@@ -229,6 +273,22 @@ class BinaryBlockCode(tk.Tk):
         return -1
 
     def findPattern(self, currentColumn):
+        """ Funkcija za pronalazak uzorka, npr. pocetak retka [0,0,1,...], ovisno o tome
+        koji je trenutni indeks stupca
+
+        Primjer:
+            Da bi u matrici [1, 1, 0]
+                            [0, 1, 0]
+                            [0, 0, 1]
+            razrjesili jedinicu na indeksu (1, 2) moramo pronaci redak [0, 1, ...] jer ce
+            taj redak dati rezultantni redak mnozenja [1, 0, ...], a sto nam pomaze
+            kod standardizacije matrice
+
+            Ova funkcija upravo vrace indeks retka s tim potrebitim uzorkom.
+
+        :param currentColumn: trenutni indeks stupca
+        :return: broj retka s trazenim uzorkom
+        """
 
         numOfRows = self.genMat.__len__()
 
@@ -246,17 +306,19 @@ class BinaryBlockCode(tk.Tk):
         return -1
 
     def multiplyMod2(self, v):
+        """ Funkcija za mnozenje kodne rijeci v i trenutne generirajuce matrice
 
-        numOfRows = self.genMat.__len__()
-        numOfColumns = self.genMat[0].__len__()
+        :param v: vektor koji mnozi generirajucu matricu
+        :return: rezultantni vektor
+        """
 
-        result = [0] * numOfColumns
+        result = [0] * self.columns
 
-        for c in range(numOfColumns):
+        for c in range(self.columns):
 
             column = self.getColumn(c)
 
-            for i in range(numOfRows):
+            for i in range(self.rows):
                 result[c] += v[i] * column[i]
 
         return [x % 2 for x in result]
@@ -271,6 +333,7 @@ class BinaryBlockCode(tk.Tk):
         codeWords = []
 
         # kodnih rijeci ima 2 na zeljenu duljinu, odnosno dim
+        # prvo se generiraju binarne reprezentacije decimalnih brojeva
         for i in range(int(math.pow(2, dim))):
 
             tempCodeWord = [0] * dim
@@ -286,9 +349,17 @@ class BinaryBlockCode(tk.Tk):
 
             codeWords.append(tempCodeWord)
 
+        # kodne rijeci se dobiju mnozenjem vec dobivenih binarnih brojeva
+        # s generirajucom matricom
+        for i in range(codeWords.__len__()):
+            codeWords[i] = self.multiplyMod2(codeWords[i])
+
         return codeWords
 
     def normalize(self):
+        """ Funkcija za svodjenje generirajuce matrica u strandardnu formu
+        :return:
+        """
 
         numOfRows = self.genMat.__len__()
 
@@ -334,6 +405,9 @@ class BinaryBlockCode(tk.Tk):
         self.genMatPrint()
 
     def genMatPrint(self):
+        """ Funkcija za ispis generirajuce matrice
+        :return:
+        """
 
         self.console.insert(tk.END, "[INFO] ispis generirajuce matrice\n")
         self.console.see(tk.END)
@@ -343,6 +417,9 @@ class BinaryBlockCode(tk.Tk):
             self.console.see(tk.END)
 
     def showNK(self):
+        """ Funkcija za ispis n i k parametra blok koda
+        :return:
+        """
 
         self.console.insert(tk.END, "[INFO] n generirajce matrice iznosi: " + str(self.n) + "\n")
         self.console.see(tk.END)
@@ -350,24 +427,39 @@ class BinaryBlockCode(tk.Tk):
         self.console.see(tk.END)
 
     def linear(self):
+        """ Fnkcija za provjeru je li blok kod linearan
+
+        :return:
+        """
+
+        # generiraju se kodne rijeci pomocu trenutne generirajuce matrice
+        self.codeWords = self.generateCodeWords(self.k)
 
         for i in range(self.rows):
             for j in range(self.rows):
+
+                # iste kodne rijeci se preskacu
+                if i == j:
+                    continue
+
+                # kodna rijec dobivena mnozenjem dvije kodne rijeci
                 temp = [0] * self.columns
                 for k in range(self.columns):
                     temp[k] = self.genMat[i][k] ^ self.genMat[j][k]
-                if not self.codeWords.__contains__(temp):
-                    self.codeWords.append(temp)
 
-        zeroCodeWord = [0] * self.columns
-        if self.codeWords.__contains__(zeroCodeWord):
-            self.console.insert(tk.END, "[INFO] kod je linearan\n")
-            self.console.see(tk.END)
-        else:
-            self.console.insert(tk.END, "[INFO] kod nije linearan\n")
-            self.console.see(tk.END)
+                # ako generirane kodne rijeci ne sadrze umnozak neke dvije kodne rijeci, kod nije linearan
+                if not self.codeWords.__contains__(temp):
+                    self.console.insert(tk.END, "[INFO] kod nije linearan\n")
+                    self.console.see(tk.END)
+                    return
+
+        self.console.insert(tk.END, "[INFO] kod je linearan\n")
+        self.console.see(tk.END)
 
     def codingSpeed(self):
+        """ Funkcija za izracun i ispis kodne brzine
+        :return:
+        """
 
         cs = self.k / self.n
 
@@ -375,6 +467,11 @@ class BinaryBlockCode(tk.Tk):
         self.console.see(tk.END)
 
     def setExample(self, num):
+        """ Funkcija za postavljanje generirajuce matrice i ostalih parametara
+        nakon klika na neki od gumba "Primjer"
+        :param num: redni broj primjera
+        :return:
+        """
 
         if num == 1:
             self.genMat = [[0, 0, 1, 1, 1],
@@ -421,7 +518,11 @@ class BinaryBlockCode(tk.Tk):
         self.k = self.genMat.__len__()
 
     def code(self):
+        """ Funkcija za kodiranje unesene zeljene rijeci
+        :return:
+        """
 
+        # unesena rijec koju treba kodirati
         inputString = self.frames[CodingPage].codeEntry.get()
 
         if inputString == "":
@@ -438,6 +539,7 @@ class BinaryBlockCode(tk.Tk):
             for i in range(inputString.__len__()):
                 inputCode.append(int(inputString[i]))
 
+            # unesena rijec mora biti visekratnik retka generirajuce matrice, odnosno broja k
             if inputCode.__len__() % self.k != 0:
                 self.console.insert(tk.END, "[ERROR] duljina rijeci za kodirati nije visekratnik broja " + str(self.k) + "\n")
                 self.console.see(tk.END)

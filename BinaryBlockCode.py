@@ -71,7 +71,7 @@ class BinaryBlockCode(tk.Tk):
         if self.frames[GenMatPage].entryRows.get() != "":
             try:
                 self.rows = int(self.frames[GenMatPage].entryRows.get())
-                self.console.insert(tk.END, "[INFO] broj redaka: " + str(self.rows) + "\n")
+                self.console.insert(tk.END, "broj redaka: " + str(self.rows) + "\n")
                 self.console.see(tk.END)
             except ValueError:
                 self.console.insert(tk.END, "[ERROR] broj redaka mora biti pozitivan broj\n")
@@ -84,7 +84,7 @@ class BinaryBlockCode(tk.Tk):
         if self.frames[GenMatPage].entryColumns.get() != "":
             try:
                 self.columns = int(self.frames[GenMatPage].entryColumns.get())
-                self.console.insert(tk.END, "[INFO] broj stupaca: " + str(self.columns) + "\n")
+                self.console.insert(tk.END, "broj stupaca: " + str(self.columns) + "\n")
                 self.console.see(tk.END)
             except ValueError:
                 self.console.insert(tk.END, "[ERROR] broj stupaca mora biti pozitivan broj\n")
@@ -186,7 +186,8 @@ class BinaryBlockCode(tk.Tk):
 
     def isGenMatStandardized(self):
         """ Funkcija za provjeru je li generirajuca matrica standardizirana, odnosno je li u standardnoj formi
-        :return:
+
+        :return: true ako je matrica u standardnom obliku, false ako nije
         """
 
         #FIXME
@@ -195,7 +196,8 @@ class BinaryBlockCode(tk.Tk):
         for i in range(self.k):
 
             if self.genMat[i][i] == 0:
-                print("generirajuca matrica nije standardizirana")
+                self.console.insert(tk.END, "generirajuca matrica nije u standardnom obliku\n")
+                self.console.see(tk.END)
                 flag = False
                 break
 
@@ -207,7 +209,8 @@ class BinaryBlockCode(tk.Tk):
                     flag = False
                     break
         if flag:
-            print("generirajuca matrica je standardizirana")
+            self.console.insert(tk.END, "generirajuca matrica je u standardnom obliku\n")
+            self.console.see(tk.END)
 
     def swapRows(self, r1, r2):
         """ Funkcija za zamjenu dva retka generirajuce matrice
@@ -409,7 +412,7 @@ class BinaryBlockCode(tk.Tk):
         :return:
         """
 
-        self.console.insert(tk.END, "[INFO] ispis generirajuce matrice\n")
+        self.console.insert(tk.END, "ispis generirajuce matrice\n")
         self.console.see(tk.END)
 
         for row in self.genMat:
@@ -421,9 +424,9 @@ class BinaryBlockCode(tk.Tk):
         :return:
         """
 
-        self.console.insert(tk.END, "[INFO] n generirajce matrice iznosi: " + str(self.n) + "\n")
+        self.console.insert(tk.END, "n generirajce matrice iznosi: " + str(self.n) + "\n")
         self.console.see(tk.END)
-        self.console.insert(tk.END, "[INFO] k generirajuce matrice iznosi: " + str(self.k) + "\n")
+        self.console.insert(tk.END, "k generirajuce matrice iznosi: " + str(self.k) + "\n")
         self.console.see(tk.END)
 
     def linear(self):
@@ -449,11 +452,11 @@ class BinaryBlockCode(tk.Tk):
 
                 # ako generirane kodne rijeci ne sadrze umnozak neke dvije kodne rijeci, kod nije linearan
                 if not self.codeWords.__contains__(temp):
-                    self.console.insert(tk.END, "[INFO] kod nije linearan\n")
+                    self.console.insert(tk.END, "kod nije linearan\n")
                     self.console.see(tk.END)
                     return
 
-        self.console.insert(tk.END, "[INFO] kod je linearan\n")
+        self.console.insert(tk.END, "kod je linearan\n")
         self.console.see(tk.END)
 
     def codingSpeed(self):
@@ -463,7 +466,7 @@ class BinaryBlockCode(tk.Tk):
 
         cs = self.k / self.n
 
-        self.console.insert(tk.END, "[INFO] kodna brzina zastitnog koda je: " + str(cs) + "\n")
+        self.console.insert(tk.END, "kodna brzina zastitnog koda je: " + str(cs) + "\n")
         self.console.see(tk.END)
 
     def setExample(self, num):
@@ -556,7 +559,7 @@ class BinaryBlockCode(tk.Tk):
                 for i in coddedMessage:
                     coddedMessageString = coddedMessageString + str(i)
 
-                self.console.insert(tk.END, "[INFO] kodirana poruka: " + inputString + " je " + coddedMessageString + "\n")
+                self.console.insert(tk.END, "kodirana poruka: " + inputString + " je " + coddedMessageString + "\n")
                 self.console.see(tk.END)
 
 
@@ -640,7 +643,8 @@ class GenMatPage(tk.Frame):
                                                                            controller.makeEntries()])
         buttonInput.pack(side="left", padx=10, pady=10)
 
-        buttonGenMat = tk.Button(buttonFrame, text="generiraj matricu", command=controller.getGenMat)
+        buttonGenMat = tk.Button(buttonFrame, text="generiraj matricu",
+                                 command=lambda: [controller.getGenMat(), controller.isGenMatStandardized()])
         buttonGenMat.pack(side="left", padx=10, pady=10)
 
         self.buttonNK = tk.Button(buttonFrame, text="n i k zadanog koda", state="disabled",
@@ -652,7 +656,7 @@ class GenMatPage(tk.Frame):
         self.buttonLin.pack(side="left", padx=10, pady=10)
 
         self.buttonNormalize = tk.Button(buttonFrame, text="normaliziraj", state="disabled",
-                                         command=lambda: controller.normalize())
+                                         command=lambda: [controller.normalize(), controller.isGenMatStandardized()])
         self.buttonNormalize.pack(side="left", padx=10, pady=10)
 
         self.buttonCodingSpeed = tk.Button(buttonFrame, text="kodna brzina", state="disabled",
